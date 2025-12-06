@@ -9,7 +9,7 @@ type AuthService struct {
 
 // Login performs login authentication
 func (s *AuthService) Login(username, password string) (*Ticket, error) {
-	reqData := map[string]interface{}{
+	reqData := map[string]any{
 		"username": username,
 		"password": password,
 	}
@@ -60,8 +60,8 @@ func (s *AuthService) GetTicketInfo() (*Ticket, error) {
 }
 
 // GetPermissions retrieves user permissions
-func (s *AuthService) GetPermissions(path string) (map[string]interface{}, error) {
-	req, err := s.client.NewRequest("GET", "access/permissions", map[string]interface{}{
+func (s *AuthService) GetPermissions(path string) (map[string]any, error) {
+	req, err := s.client.NewRequest("GET", "access/permissions", map[string]any{
 		"path": path,
 	})
 	if err != nil {
@@ -69,7 +69,7 @@ func (s *AuthService) GetPermissions(path string) (map[string]interface{}, error
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -80,14 +80,14 @@ func (s *AuthService) GetPermissions(path string) (map[string]interface{}, error
 }
 
 // GetUsers retrieves all users
-func (s *AuthService) GetUsers() ([]map[string]interface{}, error) {
+func (s *AuthService) GetUsers() ([]map[string]any, error) {
 	req, err := s.client.NewRequest("GET", "access/users", nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data []map[string]interface{}
+		Data []map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -98,14 +98,14 @@ func (s *AuthService) GetUsers() ([]map[string]interface{}, error) {
 }
 
 // GetUser retrieves a specific user
-func (s *AuthService) GetUser(userid string) (map[string]interface{}, error) {
+func (s *AuthService) GetUser(userid string) (map[string]any, error) {
 	req, err := s.client.NewRequest("GET", fmt.Sprintf("access/users/%s", userid), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -117,10 +117,10 @@ func (s *AuthService) GetUser(userid string) (map[string]interface{}, error) {
 
 // CreateUser creates a new user
 func (s *AuthService) CreateUser(userid, password, email string) error {
-	req, err := s.client.NewRequest("POST", "access/users", map[string]interface{}{
-		"userid":  userid,
+	req, err := s.client.NewRequest("POST", "access/users", map[string]any{
+		"userid":   userid,
 		"password": password,
-		"email":   email,
+		"email":    email,
 	})
 	if err != nil {
 		return err
@@ -132,7 +132,7 @@ func (s *AuthService) CreateUser(userid, password, email string) error {
 
 // UpdateUser updates user information
 func (s *AuthService) UpdateUser(userid, email string) error {
-	req, err := s.client.NewRequest("PUT", fmt.Sprintf("access/users/%s", userid), map[string]interface{}{
+	req, err := s.client.NewRequest("PUT", fmt.Sprintf("access/users/%s", userid), map[string]any{
 		"email": email,
 	})
 	if err != nil {
@@ -155,14 +155,14 @@ func (s *AuthService) DeleteUser(userid string) error {
 }
 
 // GetRoles retrieves all roles
-func (s *AuthService) GetRoles() ([]map[string]interface{}, error) {
+func (s *AuthService) GetRoles() ([]map[string]any, error) {
 	req, err := s.client.NewRequest("GET", "access/roles", nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data []map[string]interface{}
+		Data []map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {

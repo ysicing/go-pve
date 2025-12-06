@@ -62,14 +62,14 @@ func (s *NodesService) GetDetailed(name string) (*NodeInfo, error) {
 }
 
 // GetStatus retrieves node status
-func (s *NodesService) GetStatus(name string) (map[string]interface{}, error) {
+func (s *NodesService) GetStatus(name string) (map[string]any, error) {
 	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/status", name), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -80,14 +80,50 @@ func (s *NodesService) GetStatus(name string) (map[string]interface{}, error) {
 }
 
 // GetVersion retrieves node version information
-func (s *NodesService) GetVersion(name string) (map[string]interface{}, error) {
+func (s *NodesService) GetVersion(name string) (map[string]any, error) {
 	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/status/version", name), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// GetConfig retrieves node configuration information
+func (s *NodesService) GetConfig(name string) (map[string]any, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/config", name), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data map[string]any
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// CreateVNCShell creates a VNC shell for node access
+func (s *NodesService) CreateVNCShell(name string) (map[string]any, error) {
+	req, err := s.client.NewRequest("POST", fmt.Sprintf("nodes/%s/vncshell", name), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -98,14 +134,14 @@ func (s *NodesService) GetVersion(name string) (map[string]interface{}, error) {
 }
 
 // GetSubscription retrieves node subscription information
-func (s *NodesService) GetSubscription(name string) (map[string]interface{}, error) {
+func (s *NodesService) GetSubscription(name string) (map[string]any, error) {
 	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/subscription", name), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -117,7 +153,7 @@ func (s *NodesService) GetSubscription(name string) (map[string]interface{}, err
 
 // GetSyslog retrieves node system log
 func (s *NodesService) GetSyslog(name string, lines int) ([]string, error) {
-	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/syslog", name), map[string]interface{}{
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/syslog", name), map[string]any{
 		"lines": lines,
 	})
 	if err != nil {
@@ -136,8 +172,8 @@ func (s *NodesService) GetSyslog(name string, lines int) ([]string, error) {
 }
 
 // GetRRD retrieves node RRD (Round Robin Database) data
-func (s *NodesService) GetRRD(name, timeframe string) (map[string]interface{}, error) {
-	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/rrddata", name), map[string]interface{}{
+func (s *NodesService) GetRRD(name, timeframe string) (map[string]any, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/rrddata", name), map[string]any{
 		"timeframe": timeframe,
 	})
 	if err != nil {
@@ -145,7 +181,7 @@ func (s *NodesService) GetRRD(name, timeframe string) (map[string]interface{}, e
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {

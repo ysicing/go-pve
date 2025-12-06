@@ -102,32 +102,20 @@ func (s *ClusterService) Tasks() ([]*Task, error) {
 	return result.Data, nil
 }
 
-// Status returns detailed cluster status
-func (s *ClusterService) Status() (*Cluster, error) {
-	cluster, err := s.Get()
+// Status retrieves cluster status and node list
+func (s *ClusterService) Status() ([]*ClusterStatus, error) {
+	req, err := s.client.NewRequest("GET", "cluster/status", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get additional status information
-	resources, err := s.Resources()
+	var result struct {
+		Data []*ClusterStatus
+	}
+	_, err = s.client.Do(req, &result)
 	if err != nil {
-		return cluster, nil
+		return nil, err
 	}
 
-	// Add resources to cluster for convenience
-	for _, r := range resources {
-		if r.Type == "node" {
-			cluster.Nodes = append(cluster.Nodes, &Node{
-				Name:     r.Name,
-				Status:   r.Status,
-				CPU:      r.CPU,
-				Mem:      r.Mem,
-				MaxMem:   r.MaxMem,
-				Uptime:   r.Uptime,
-			})
-		}
-	}
-
-	return cluster, nil
+	return result.Data, nil
 }

@@ -70,13 +70,13 @@ type Client struct {
 	limiter RateLimiter
 
 	// API services
-	Cluster  *ClusterService
-	Nodes    *NodesService
-	VMs      *VMsService
-	Storage  *StorageService
-	Tasks    *TasksService
-	Auth     *AuthService
-	Version  *VersionService
+	Cluster *ClusterService
+	Nodes   *NodesService
+	VMs     *VMsService
+	Storage *StorageService
+	Tasks   *TasksService
+	Auth    *AuthService
+	Version *VersionService
 
 	// User agent
 	UserAgent string
@@ -169,7 +169,7 @@ func WithUserAgent(ua string) ClientOptionFunc {
 }
 
 // NewRequest creates an HTTP request
-func (c *Client) NewRequest(method, path string, opt interface{}, options ...RequestOptionFunc) (*http.Request, error) {
+func (c *Client) NewRequest(method, path string, opt any, options ...RequestOptionFunc) (*http.Request, error) {
 	u := c.baseURL.String() + apiVersionPath + path
 
 	// Add query parameters
@@ -202,7 +202,7 @@ func (c *Client) NewRequest(method, path string, opt interface{}, options ...Req
 }
 
 // Do executes an HTTP request
-func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
+func (c *Client) Do(req *http.Request, v any) (*Response, error) {
 	// Rate limiting
 	if c.limiter != nil {
 		if err := c.limiter.Wait(req.Context()); err != nil {
@@ -328,12 +328,12 @@ func (c *Client) passwordAuth() error {
 	}
 
 	// Parse response
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(resp.Body, &result); err != nil {
 		return err
 	}
 
-	data, ok := result["data"].(map[string]interface{})
+	data, ok := result["data"].(map[string]any)
 	if !ok {
 		return errors.New("invalid authentication response")
 	}
@@ -353,12 +353,20 @@ func (c *Client) passwordAuth() error {
 func (c *Client) tokenAuth() error {
 	// For token auth, we don't need to authenticate via API
 	// Just construct the authorization header
+	// Format: PVEAPIToken=USER@REALM!TOKENID=SECRET
+	// Example: PVEAPIToken=root@pam!mytoken=8c8b4f9e-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 	username := c.authOptions.Username
 	if username == "" {
 		return errors.New("username is required for token authentication")
 	}
+	if c.authOptions.TokenID == "" {
+		return errors.New("token ID is required for token authentication")
+	}
+	if c.authOptions.TokenSecret == "" {
+		return errors.New("token secret is required for token authentication")
+	}
 
-	c.authToken = "PVEAPIToken=" + username + "@" + c.authOptions.TokenID + "!" + c.authOptions.TokenSecret
+	c.authToken = "PVEAPIToken=" + username + "!" + c.authOptions.TokenID + "=" + c.authOptions.TokenSecret
 
 	return nil
 }
@@ -402,7 +410,7 @@ func (c *Client) ParseError(r *Response) error {
 }
 
 // parseID converts various ID types to string
-func parseID(id interface{}) (string, error) {
+func parseID(id any) (string, error) {
 	switch v := id.(type) {
 	case int:
 		return strconv.Itoa(v), nil

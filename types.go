@@ -6,35 +6,35 @@ import (
 
 // VM represents a Virtual Machine or Container
 type VM struct {
-	ID        int         `json:"vmid"`
-	Name      string      `json:"name"`
-	Node      string      `json:"node"`
-	Type      string      `json:"type"`
-	Status    string      `json:"status"`
-	CPU       float64     `json:"cpu"`
-	Mem       int64       `json:"mem"`
-	MaxMem    int64       `json:"maxmem"`
-	Disk      int64       `json:"disk"`
-	MaxDisk   int64       `json:"maxdisk"`
-	DiskRead  int64       `json:"diskread"`
-	DiskWrite int64       `json:"diskwrite"`
-	NetIn     int64       `json:"netin"`
-	NetOut    int64       `json:"netout"`
-	Uptime    int         `json:"uptime"`
-	Template  int         `json:"template"`
-	PID       int         `json:"pid"`
-	Config    VMConfig    `json:"-"`
-	VMData    interface{} `json:"data"`
+	ID        int      `json:"vmid"`
+	Name      string   `json:"name"`
+	Node      string   `json:"node"`
+	Type      string   `json:"type"`
+	Status    string   `json:"status"`
+	CPU       float64  `json:"cpu"`
+	Mem       int64    `json:"mem"`
+	MaxMem    int64    `json:"maxmem"`
+	Disk      int64    `json:"disk"`
+	MaxDisk   int64    `json:"maxdisk"`
+	DiskRead  int64    `json:"diskread"`
+	DiskWrite int64    `json:"diskwrite"`
+	NetIn     int64    `json:"netin"`
+	NetOut    int64    `json:"netout"`
+	Uptime    int      `json:"uptime"`
+	Template  int      `json:"template"`
+	PID       int      `json:"pid"`
+	Config    VMConfig `json:"-"`
+	VMData    any      `json:"data"`
 }
 
 // VMListOptions specifies VM listing options
 type VMListOptions struct {
-	Content   string `url:"content,omitempty"`
-	VMType    string `url:"vmtype,omitempty"`
-	Storage   string `url:"storage,omitempty"`
-	Node      string `url:"node,omitempty"`
-	Enabled   *bool  `url:"enabled,omitempty"`
-	Full      *bool  `url:"full,omitempty"`
+	Content string `url:"content,omitempty"`
+	VMType  string `url:"vmtype,omitempty"`
+	Storage string `url:"storage,omitempty"`
+	Node    string `url:"node,omitempty"`
+	Enabled *bool  `url:"enabled,omitempty"`
+	Full    *bool  `url:"full,omitempty"`
 }
 
 // StorageListOptions specifies storage listing options
@@ -67,18 +67,18 @@ type VMs []*VM
 
 // Node represents a Proxmox node
 type Node struct {
-	Name      string    `json:"node"`
-	Status    string    `json:"status"`
-	CPU       float64   `json:"cpu"`
-	MaxCPU    int       `json:"maxcpu"`
-	Mem       int64     `json:"mem"`
-	MaxMem    int64     `json:"maxmem"`
-	Storage   int64     `json:"storage"`
-	MaxStorage int64    `json:"maxstorage"`
-	Uptime    int       `json:"uptime"`
-	Level     string    `json:"level"`
-	LocalTime int       `json:"localtime"`
-	Support   string    `json:"support"`
+	Name       string  `json:"node"`
+	Status     string  `json:"status"`
+	CPU        float64 `json:"cpu"`
+	MaxCPU     int     `json:"maxcpu"`
+	Mem        int64   `json:"mem"`
+	MaxMem     int64   `json:"maxmem"`
+	Storage    int64   `json:"storage"`
+	MaxStorage int64   `json:"maxstorage"`
+	Uptime     int     `json:"uptime"`
+	Level      string  `json:"level"`
+	LocalTime  int     `json:"localtime"`
+	Support    string  `json:"support"`
 }
 
 // Nodes represents a list of nodes
@@ -97,44 +97,56 @@ type Cluster struct {
 
 // ClusterResource represents a cluster resource
 type ClusterResource struct {
-	ID         string      `json:"id"`
-	Type       string      `json:"type"`
-	Content    string      `json:"content"`
-	VMID       int         `json:"vmid"`
-	Name       string      `json:"name"`
-	Status     string      `json:"status"`
-	MaxMem     int64       `json:"maxmem"`
-	Mem        int64       `json:"mem"`
-	MaxDisk    int64       `json:"maxdisk"`
-	Disk       int64       `json:"disk"`
-	CPU        float64     `json:"cpu"`
-	Uptime     int         `json:"uptime"`
-	Node       string      `json:"node"`
-	Plugin     string      `json:"plugin"`
-	Storage    string      `json:"storage"`
-	Enable     int         `json:"enable"`
-	Shared     int         `json:"shared"`
-	Used       int64       `json:"used"`
-	Avail      int64       `json:"avail"`
+	ID      string  `json:"id"`
+	Type    string  `json:"type"`
+	Content string  `json:"content"`
+	VMID    int     `json:"vmid"`
+	Name    string  `json:"name"`
+	Status  string  `json:"status"`
+	MaxMem  int64   `json:"maxmem"`
+	Mem     int64   `json:"mem"`
+	MaxDisk int64   `json:"maxdisk"`
+	Disk    int64   `json:"disk"`
+	CPU     float64 `json:"cpu"`
+	Uptime  int     `json:"uptime"`
+	Node    string  `json:"node"`
+	Plugin  string  `json:"plugin"`
+	Storage string  `json:"storage"`
+	Enable  int     `json:"enable"`
+	Shared  int     `json:"shared"`
+	Used    int64   `json:"used"`
+	Avail   int64   `json:"avail"`
 }
 
 // ClusterResources represents a list of cluster resources
 type ClusterResources []*ClusterResource
 
+// ClusterStatus represents cluster status information
+type ClusterStatus struct {
+	Type    string `json:"type"`
+	Name    string `json:"name"`
+	ID      string `json:"id"`
+	IP      string `json:"ip"`
+	Online  int    `json:"online"`
+	Level   string `json:"level"`
+	Quorate int    `json:"quorate"`
+	NodeID  int    `json:"nodeid"`
+}
+
 // Storage represents a storage entity
 type Storage struct {
-	Storage   string  `json:"storage"`
-	Type      string  `json:"type"`
-	Content   string  `json:"content"`
-	Used      int64   `json:"used"`
-	Avail     int64   `json:"avail"`
-	Total     int64   `json:"total"`
-	Enabled   int     `json:"enabled"`
-	Active    int     `json:"active"`
-	Shared    int     `json:"shared"`
-	Plugin    string  `json:"plugin"`
-	Nodes     string  `json:"nodes"`
-	ID        string  `json:"id"`
+	Storage string `json:"storage"`
+	Type    string `json:"type"`
+	Content string `json:"content"`
+	Used    int64  `json:"used"`
+	Avail   int64  `json:"avail"`
+	Total   int64  `json:"total"`
+	Enabled int    `json:"enabled"`
+	Active  int    `json:"active"`
+	Shared  int    `json:"shared"`
+	Plugin  string `json:"plugin"`
+	Nodes   string `json:"nodes"`
+	ID      string `json:"id"`
 }
 
 // Storages represents a list of storage entities
@@ -161,13 +173,13 @@ type Tasks []*Task
 
 // Version represents version information
 type Version struct {
-	Version   string    `json:"version"`
-	Reponame  string    `json:"repodate"`
-	Release   string    `json:"release"`
-	VersionID string    `json:"version_id"`
-	Keyboard  string    `json:"keyboard"`
-	Timezone  string    `json:"timezone"`
-	Languages []string  `json:"language"`
+	Version   string   `json:"version"`
+	Reponame  string   `json:"repodate"`
+	Release   string   `json:"release"`
+	VersionID string   `json:"version_id"`
+	Keyboard  string   `json:"keyboard"`
+	Timezone  string   `json:"timezone"`
+	Languages []string `json:"language"`
 	PVE       struct {
 		Version   string `json:"version"`
 		Repoid    string `json:"repid"`
@@ -186,21 +198,21 @@ type Ticket struct {
 
 // VMStatus represents VM status information
 type VMStatus struct {
-	VMID        int     `json:"vmid"`
-	Name        string  `json:"name"`
-	Status      string  `json:"status"`
-	CPU         float64 `json:"cpu"`
-	Mem         int64   `json:"mem"`
-	MaxMem      int64   `json:"maxmem"`
-	Disk        int64   `json:"disk"`
-	MaxDisk     int64   `json:"maxdisk"`
-	DiskRead    int64   `json:"diskread"`
-	DiskWrite   int64   `json:"diskwrite"`
-	NetIn       int64   `json:"netin"`
-	NetOut      int64   `json:"netout"`
-	Uptime      int     `json:"uptime"`
-	PID         int     `json:"pid"`
-	HA          struct {
+	VMID      int     `json:"vmid"`
+	Name      string  `json:"name"`
+	Status    string  `json:"status"`
+	CPU       float64 `json:"cpu"`
+	Mem       int64   `json:"mem"`
+	MaxMem    int64   `json:"maxmem"`
+	Disk      int64   `json:"disk"`
+	MaxDisk   int64   `json:"maxdisk"`
+	DiskRead  int64   `json:"diskread"`
+	DiskWrite int64   `json:"diskwrite"`
+	NetIn     int64   `json:"netin"`
+	NetOut    int64   `json:"netout"`
+	Uptime    int     `json:"uptime"`
+	PID       int     `json:"pid"`
+	HA        struct {
 		Managed int `json:"managed"`
 	} `json:"ha"`
 	MaxProcs   int    `json:"maxprocs"`
@@ -214,14 +226,14 @@ type VMStatus struct {
 
 // VMSnapshot represents a VM snapshot
 type VMSnapshot struct {
-	SNAPSHOT string                 `json:"sn"`
-	VMID     int                    `json:"vmid"`
-	Name     string                 `json:"name"`
-	Date     int                    `json:"date"`
-	Parent   string                 `json:"parent"`
-	State    int                    `json:"state"`
-	Desc     string                 `json:"description"`
-	Config   map[string]interface{} `json:"config"`
+	SNAPSHOT string         `json:"sn"`
+	VMID     int            `json:"vmid"`
+	Name     string         `json:"name"`
+	Date     int            `json:"date"`
+	Parent   string         `json:"parent"`
+	State    int            `json:"state"`
+	Desc     string         `json:"description"`
+	Config   map[string]any `json:"config"`
 }
 
 // VMSnapshots represents a list of VM snapshots
@@ -251,10 +263,10 @@ type GuestNetworkInterface struct {
 
 // GuestIPAddress represents an IP address
 type GuestIPAddress struct {
-	IP         string `json:"ip-address"`
-	Netmask    string `json:"netmask"`
-	IPVersion  int    `json:"ip-version"`
-	Scope      string `json:"scope"`
+	IP        string `json:"ip-address"`
+	Netmask   string `json:"netmask"`
+	IPVersion int    `json:"ip-version"`
+	Scope     string `json:"scope"`
 }
 
 // GuestExec represents guest execution information
@@ -280,12 +292,12 @@ type GuestExecResult struct {
 
 // NodeInfo represents detailed node information
 type NodeInfo struct {
-	Node       string                 `json:"node"`
-	Cpuinfo    map[string]interface{} `json:"cpuinfo"`
-	Kversion   string                 `json:"kversion"`
-	MaxDisk    int64                  `json:"maxdisk"`
-	MaxMem     int64                  `json:"maxmem"`
-	SharedMaxDisk int64               `json:"shared_maxdisk"`
+	Node          string         `json:"node"`
+	Cpuinfo       map[string]any `json:"cpuinfo"`
+	Kversion      string         `json:"kversion"`
+	MaxDisk       int64          `json:"maxdisk"`
+	MaxMem        int64          `json:"maxmem"`
+	SharedMaxDisk int64          `json:"shared_maxdisk"`
 }
 
 // RequestOptionFunc is a function type for request options
@@ -297,4 +309,51 @@ func WithHeader(key, value string) RequestOptionFunc {
 		req.Header.Set(key, value)
 		return nil
 	}
+}
+
+// MigrateOptions specifies VM migration options
+type MigrateOptions struct {
+	Online           bool   // Online migration
+	Force            bool   // Force migration
+	MigrationNetwork string // Migration network
+	BWLimit          int    // Bandwidth limit (KB/s)
+	TargetStorage    string // Target storage
+	Delete           bool   // Delete source data
+}
+
+// NetworkInterface represents a VM network interface
+type NetworkInterface struct {
+	Name             string              `json:"name"`
+	HardwareAddress  string              `json:"hardware-address"`
+	IPAddresses      []NetworkIPAddress  `json:"ip-addresses"`
+	Statistics       *NetworkStatistics  `json:"statistics,omitempty"`
+}
+
+// NetworkIPAddress represents an IP address
+type NetworkIPAddress struct {
+	IPAddress     string `json:"ip-address"`
+	IPAddressType string `json:"ip-address-type"`
+	Prefix        int    `json:"prefix"`
+}
+
+// NetworkStatistics represents network statistics
+type NetworkStatistics struct {
+	RXBytes   int64 `json:"rx-bytes"`
+	RXPackets int64 `json:"rx-packets"`
+	RXErrors  int64 `json:"rx-errors"`
+	RXDropped int64 `json:"rx-dropped"`
+	TXBytes   int64 `json:"tx-bytes"`
+	TXPackets int64 `json:"tx-packets"`
+	TXErrors  int64 `json:"tx-errors"`
+	TXDropped int64 `json:"tx-dropped"`
+}
+
+// FilesystemInfo represents filesystem information
+type FilesystemInfo struct {
+	Name        string `json:"name"`
+	Mountpoint  string `json:"mountpoint"`
+	Type        string `json:"type"`
+	TotalBytes  int64  `json:"total-bytes"`
+	UsedBytes   int64  `json:"used-bytes"`
+	AvailBytes  int64  `json:"available-bytes,omitempty"`
 }

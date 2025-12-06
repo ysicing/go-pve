@@ -22,14 +22,14 @@ func (s *VersionService) Get() (*Version, error) {
 }
 
 // GetAPT retrieves APT version information
-func (s *VersionService) GetAPT() (map[string]interface{}, error) {
+func (s *VersionService) GetAPT() (map[string]any, error) {
 	req, err := s.client.NewRequest("GET", "apt/update", nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -40,14 +40,14 @@ func (s *VersionService) GetAPT() (map[string]interface{}, error) {
 }
 
 // GetPackages retrieves available packages
-func (s *VersionService) GetPackages() ([]map[string]interface{}, error) {
+func (s *VersionService) GetPackages() ([]map[string]any, error) {
 	req, err := s.client.NewRequest("GET", "apt/versions", nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data []map[string]interface{}
+		Data []map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -59,7 +59,7 @@ func (s *VersionService) GetPackages() ([]map[string]interface{}, error) {
 
 // Changelog retrieves changelog information for a package
 func (s *VersionService) Changelog(packageName string) (string, error) {
-	req, err := s.client.NewRequest("GET", "apt/changelog", map[string]interface{}{
+	req, err := s.client.NewRequest("GET", "apt/changelog", map[string]any{
 		"package": packageName,
 	})
 	if err != nil {

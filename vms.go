@@ -349,7 +349,7 @@ func (s *VMsService) CreateSnapshot(vmid int, name, description string) (*Task, 
 	}
 
 	req, err := s.client.NewRequest("POST", fmt.Sprintf("nodes/%s/%s/%d/snapshot", vm.Node, vm.Type, vmid), map[string]string{
-		"snapname":  name,
+		"snapname":    name,
 		"description": description,
 	})
 	if err != nil {
@@ -420,11 +420,11 @@ func (s *VMsService) Clone(vmid int, newID int, name string) (*Task, error) {
 		return nil, err
 	}
 
-	req, err := s.client.NewRequest("POST", fmt.Sprintf("nodes/%s/%s/%d/clone", vm.Node, vm.Type, vmid), map[string]interface{}{
-		"vmid":     newID,
-		"name":     name,
-		"full":     1,
-		"target":   vm.Node,
+	req, err := s.client.NewRequest("POST", fmt.Sprintf("nodes/%s/%s/%d/clone", vm.Node, vm.Type, vmid), map[string]any{
+		"vmid":   newID,
+		"name":   name,
+		"full":   1,
+		"target": vm.Node,
 	})
 	if err != nil {
 		return nil, err
@@ -442,7 +442,7 @@ func (s *VMsService) Clone(vmid int, newID int, name string) (*Task, error) {
 }
 
 // GetVNCInfo retrieves VNC console information
-func (s *VMsService) GetVNCInfo(vmid int) (map[string]interface{}, error) {
+func (s *VMsService) GetVNCInfo(vmid int) (map[string]any, error) {
 	vm, err := s.GetVMResource(vmid)
 	if err != nil {
 		return nil, err
@@ -454,7 +454,7 @@ func (s *VMsService) GetVNCInfo(vmid int) (map[string]interface{}, error) {
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -533,4 +533,178 @@ func (s *VMsService) GetExecOutput(vmid int, pid int) (*GuestExecResult, error) 
 	}
 
 	return result.Data, nil
+}
+
+// Reset hard resets a QEMU VM
+func (s *VMsService) Reset(vmid int) (*Task, error) {
+	vm, err := s.GetVMResource(vmid)
+	if err != nil {
+		return nil, err
+	}
+
+	if vm.Type != "qemu" {
+		return nil, fmt.Errorf("reset is only supported for QEMU VMs")
+	}
+
+	req, err := s.client.NewRequest("POST", fmt.Sprintf("nodes/%s/qemu/%d/status/reset", vm.Node, vmid), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data *Task
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// ResizeDisk resizes a VM disk
+func (s *VMsService) ResizeDisk(vmid int, disk string, size string) (*Task, error) {
+	vm, err := s.GetVMResource(vmid)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := s.client.NewRequest("PUT", fmt.Sprintf("nodes/%s/%s/%d/resize", vm.Node, vm.Type, vmid), map[string]string{
+		"disk": disk,
+		"size": size,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data *Task
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// Migrate migrates a VM to another node
+func (s *VMsService) Migrate(vmid int, target string, options *MigrateOptions) (*Task, error) {
+	vm, err := s.GetVMResource(vmid)
+	if err != nil {
+		return nil, err
+	}
+
+	params := map[string]any{
+		"target": target,
+	}
+
+	if options != nil {
+		if options.Online {
+			params["online"] = 1
+		}
+		if options.Force {
+			params["force"] = 1
+		}
+		if options.MigrationNetwork != "" {
+			params["migration_network"] = options.MigrationNetwork
+		}
+		if options.BWLimit > 0 {
+			params["bwlimit"] = options.BWLimit
+		}
+		if options.TargetStorage != "" {
+			params["targetstorage"] = options.TargetStorage
+		}
+		if options.Delete {
+			params["delete"] = 1
+		}
+	}
+
+	req, err := s.client.NewRequest("POST", fmt.Sprintf("nodes/%s/%s/%d/migrate", vm.Node, vm.Type, vmid), params)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data *Task
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// GetNetworkInterfaces retrieves VM network interfaces (QEMU with guest agent)
+func (s *VMsService) GetNetworkInterfaces(vmid int) ([]NetworkInterface, error) {
+	vm, err := s.GetVMResource(vmid)
+	if err != nil {
+		return nil, err
+	}
+
+	if vm.Type == "qemu" {
+		req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/qemu/%d/agent/network-get-interfaces", vm.Node, vmid), nil)
+		if err != nil {
+			return nil, err
+		}
+
+		var result struct {
+			Data struct {
+				Result []NetworkInterface `json:"result"`
+			} `json:"data"`
+		}
+		_, err = s.client.Do(req, &result)
+		if err != nil {
+			return nil, err
+		}
+
+		return result.Data.Result, nil
+	} else if vm.Type == "lxc" {
+		req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/lxc/%d/interfaces", vm.Node, vmid), nil)
+		if err != nil {
+			return nil, err
+		}
+
+		var result struct {
+			Data []NetworkInterface `json:"data"`
+		}
+		_, err = s.client.Do(req, &result)
+		if err != nil {
+			return nil, err
+		}
+
+		return result.Data, nil
+	}
+
+	return nil, fmt.Errorf("unsupported VM type: %s", vm.Type)
+}
+
+// GetFilesystemInfo retrieves VM filesystem information (QEMU with guest agent)
+func (s *VMsService) GetFilesystemInfo(vmid int) ([]FilesystemInfo, error) {
+	vm, err := s.GetVMResource(vmid)
+	if err != nil {
+		return nil, err
+	}
+
+	if vm.Type != "qemu" {
+		return nil, fmt.Errorf("filesystem info is only supported for QEMU VMs with guest agent")
+	}
+
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/qemu/%d/agent/get-fsinfo", vm.Node, vmid), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data struct {
+			Result []FilesystemInfo `json:"result"`
+		} `json:"data"`
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data.Result, nil
 }

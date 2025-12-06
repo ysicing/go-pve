@@ -87,7 +87,7 @@ func (s *TasksService) GetTaskLog(upid string) ([]string, error) {
 
 // GetTaskLogWithPaging retrieves task log with paging
 func (s *TasksService) GetTaskLogWithPaging(upid string, start, limit int) ([]string, error) {
-	req, err := s.client.NewRequest("GET", fmt.Sprintf("cluster/tasks/%s/log", upid), map[string]interface{}{
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("cluster/tasks/%s/log", upid), map[string]any{
 		"start": start,
 		"limit": limit,
 	})
@@ -143,14 +143,14 @@ func (s *TasksService) GetNodeTaskLog(nodeName, upid string) ([]string, error) {
 }
 
 // GetNodeTaskStatus retrieves task status for a node task
-func (s *TasksService) GetNodeTaskStatus(nodeName, upid string) (map[string]interface{}, error) {
+func (s *TasksService) GetNodeTaskStatus(nodeName, upid string) (map[string]any, error) {
 	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/tasks/%s/status", nodeName, upid), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
@@ -161,8 +161,8 @@ func (s *TasksService) GetNodeTaskStatus(nodeName, upid string) (map[string]inte
 }
 
 // WaitForTask waits for a task to complete
-func (s *TasksService) WaitForTask(upid string, timeout int) (map[string]interface{}, error) {
-	req, err := s.client.NewRequest("GET", fmt.Sprintf("cluster/tasks/%s/status", upid), map[string]interface{}{
+func (s *TasksService) WaitForTask(upid string, timeout int) (map[string]any, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("cluster/tasks/%s/status", upid), map[string]any{
 		"timeout": timeout,
 	})
 	if err != nil {
@@ -170,7 +170,7 @@ func (s *TasksService) WaitForTask(upid string, timeout int) (map[string]interfa
 	}
 
 	var result struct {
-		Data map[string]interface{}
+		Data map[string]any
 	}
 	_, err = s.client.Do(req, &result)
 	if err != nil {
