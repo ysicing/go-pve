@@ -357,3 +357,34 @@ type FilesystemInfo struct {
 	UsedBytes   int64  `json:"used-bytes"`
 	AvailBytes  int64  `json:"available-bytes,omitempty"`
 }
+
+// VZDumpOptions specifies vzdump backup options
+type VZDumpOptions struct {
+	VMID            string `url:"vmid,omitempty"`            // VM ID or list of IDs (comma-separated)
+	All             *bool  `url:"all,omitempty"`             // Backup all VMs
+	Mode            string `url:"mode,omitempty"`            // Backup mode: snapshot, suspend, stop
+	Storage         string `url:"storage,omitempty"`         // Storage ID for backup
+	Compress        string `url:"compress,omitempty"`        // Compression: 0, 1, gzip, lzo, zstd
+	DumpDir         string `url:"dumpdir,omitempty"`         // Directory for backup files
+	Remove          *bool  `url:"remove,omitempty"`          // Remove old backups
+	MaxFiles        int    `url:"maxfiles,omitempty"`        // Maximum number of backup files
+	Mailto          string `url:"mailto,omitempty"`          // Email address for notifications
+	MailNotification string `url:"mailnotification,omitempty"` // Mail notification: always, failure
+	Quiet           *bool  `url:"quiet,omitempty"`           // Suppress output
+	Stop            *bool  `url:"stop,omitempty"`            // Stop mode
+	Stopwait        int    `url:"stopwait,omitempty"`        // Max wait time for stop (minutes)
+	Tmpdir          string `url:"tmpdir,omitempty"`          // Temporary directory
+	Notes           string `url:"notes-template,omitempty"`  // Notes template
+	Protected       *bool  `url:"protected,omitempty"`       // Protected backup
+	PruneBackups    string `url:"prune-backups,omitempty"`   // Prune backups configuration
+	Script          string `url:"script,omitempty"`          // Hook script
+	Stdexcludes     *bool  `url:"stdexcludes,omitempty"`     // Exclude standard paths
+	Stdout          *bool  `url:"stdout,omitempty"`          // Write to stdout
+	Bwlimit         int    `url:"bwlimit,omitempty"`         // Bandwidth limit (KB/s)
+	Ionice          int    `url:"ionice,omitempty"`          // IO priority (0-8)
+	Lockwait        int    `url:"lockwait,omitempty"`        // Max wait time for lock (minutes)
+	Performance     string `url:"performance,omitempty"`     // Performance settings
+	Pigz            int    `url:"pigz,omitempty"`            // Pigz threads for compression
+	Pool            string `url:"pool,omitempty"`            // Backup pool
+	ZSTDThreads     int    `url:"zstd,omitempty"`            // ZSTD compression threads
+}

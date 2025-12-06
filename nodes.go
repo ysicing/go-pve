@@ -331,3 +331,95 @@ func (s *NodesService) GetVMs(name string) ([]*VM, error) {
 	vms := append(resultLXC.Data, resultQEMU.Data...)
 	return vms, nil
 }
+
+// GetNetstat retrieves network connection statistics for a node
+func (s *NodesService) GetNetstat(name string) ([]map[string]any, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/netstat", name), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data []map[string]any
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// GetQEMUVMs retrieves all QEMU VMs on a node
+func (s *NodesService) GetQEMUVMs(name string) ([]*VM, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/qemu", name), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data []*VM
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// GetLXCContainers retrieves all LXC containers on a node
+func (s *NodesService) GetLXCContainers(name string) ([]*VM, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/lxc", name), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data []*VM
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// CreateVZDumpBackup creates a backup task using vzdump
+func (s *NodesService) CreateVZDumpBackup(name string, options *VZDumpOptions) (*Task, error) {
+	req, err := s.client.NewRequest("POST", fmt.Sprintf("nodes/%s/vzdump", name), options)
+	if err != nil {
+		return nil, err
+	}
+
+	var result struct {
+		Data *Task
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Data, nil
+}
+
+// ExtractVZDumpConfig extracts vzdump backup configuration
+func (s *NodesService) ExtractVZDumpConfig(name, volume string) (string, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/vzdump/extractconfig", name), map[string]any{
+		"volume": volume,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	var result struct {
+		Data string
+	}
+	_, err = s.client.Do(req, &result)
+	if err != nil {
+		return "", err
+	}
+
+	return result.Data, nil
+}

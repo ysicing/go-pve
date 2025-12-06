@@ -107,8 +107,8 @@ func (s *TasksService) GetTaskLogWithPaging(upid string, start, limit int) ([]st
 }
 
 // GetNodeTasks retrieves tasks for a specific node
-func (s *NodesService) GetNodeTasks(name string) ([]*Task, error) {
-	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/tasks", name), nil)
+func (s *NodesService) GetNodeTasks(name string, options *TaskListOptions) ([]*Task, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("nodes/%s/tasks", name), options)
 	if err != nil {
 		return nil, err
 	}
