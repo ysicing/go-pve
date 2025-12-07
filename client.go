@@ -252,7 +252,16 @@ func (c *Client) Do(req *req.Request, v any) (*Response, error) {
 	if resp == nil {
 		return nil, errors.New("nil response")
 	}
-	defer resp.Response.Body.Close()
+
+	// Check for errors
+	if resp.Err != nil {
+		return nil, resp.Err
+	}
+
+	// Only close body if Response is not nil
+	if resp.Response != nil {
+		defer resp.Response.Body.Close()
+	}
 
 	// Create response wrapper
 	response := &Response{
@@ -320,7 +329,16 @@ func (c *Client) passwordAuth() error {
 	if resp == nil {
 		return errors.New("nil response")
 	}
-	defer resp.Response.Body.Close()
+
+	// Check for errors
+	if resp.Err != nil {
+		return resp.Err
+	}
+
+	// Only close body if Response is not nil
+	if resp.Response != nil {
+		defer resp.Response.Body.Close()
+	}
 
 	// Parse response
 	var result map[string]any
