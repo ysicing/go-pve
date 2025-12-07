@@ -73,6 +73,8 @@ type Client struct {
 	Cluster *ClusterService
 	Nodes   *NodesService
 	VMs     *VMsService
+	QEMU    *QEMUService
+	LXC     *LXCService
 	Storage *StorageService
 	Tasks   *TasksService
 	Auth    *AuthService
@@ -133,6 +135,8 @@ func NewClient(baseURL string, authOptions *AuthOptions, options ...ClientOption
 	c.Cluster = &ClusterService{client: c}
 	c.Nodes = &NodesService{client: c}
 	c.VMs = &VMsService{client: c}
+	c.QEMU = &QEMUService{client: c}
+	c.LXC = &LXCService{client: c}
 	c.Storage = &StorageService{client: c}
 	c.Tasks = &TasksService{client: c}
 	c.Auth = &AuthService{client: c}
