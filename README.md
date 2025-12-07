@@ -106,6 +106,25 @@ client, err := pve.NewClient(
 )
 ```
 
+## TLS Configuration
+
+### Skip TLS Verification (Testing Only)
+
+If you're using a Proxmox VE instance with self-signed certificates (common in development/testing), you can skip TLS verification:
+
+```go
+client, err := pve.NewClient(
+    "https://pve.example.com:8006",
+    &pve.AuthOptions{
+        Username: "root@pam",
+        Password: "your-password",
+    },
+    pve.WithInsecureTLS(), // Skip TLS certificate verification
+)
+```
+
+**⚠️ WARNING**: Only use `WithInsecureTLS()` in testing or development environments. This makes connections vulnerable to man-in-the-middle attacks. In production, always use properly signed certificates or import the CA certificate to your system trust store.
+
 ## API Coverage
 
 ### Cluster Service (6 methods)

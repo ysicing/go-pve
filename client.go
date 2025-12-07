@@ -3,6 +3,7 @@ package pve
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -82,6 +83,9 @@ type Client struct {
 
 	// User agent
 	UserAgent string
+
+	// TLS configuration
+	insecureTLS bool
 }
 
 // NewClient creates a new PVE API client
@@ -131,6 +135,14 @@ func NewClient(baseURL string, authOptions *AuthOptions, options ...ClientOption
 		}
 	}
 
+	// Configure TLS if insecure mode is enabled
+	if c.insecureTLS {
+		transport := httpClient.HTTPClient.Transport.(*http.Transport)
+		transport.TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
+
 	// Initialize services
 	c.Cluster = &ClusterService{client: c}
 	c.Nodes = &NodesService{client: c}
@@ -168,6 +180,16 @@ func WithRateLimiter(limiter RateLimiter) ClientOptionFunc {
 func WithUserAgent(ua string) ClientOptionFunc {
 	return func(c *Client) error {
 		c.UserAgent = ua
+		return nil
+	}
+}
+
+// WithInsecureTLS skips TLS certificate verification
+// WARNING: This should only be used in testing environments
+// It makes connections vulnerable to man-in-the-middle attacks
+func WithInsecureTLS() ClientOptionFunc {
+	return func(c *Client) error {
+		c.insecureTLS = true
 		return nil
 	}
 }
