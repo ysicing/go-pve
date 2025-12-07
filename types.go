@@ -1,9 +1,5 @@
 package pve
 
-import (
-	"net/http"
-)
-
 // VM represents a Virtual Machine or Container
 type VM struct {
 	ID        int      `json:"vmid"`
@@ -298,17 +294,6 @@ type NodeInfo struct {
 	MaxDisk       int64          `json:"maxdisk"`
 	MaxMem        int64          `json:"maxmem"`
 	SharedMaxDisk int64          `json:"shared_maxdisk"`
-}
-
-// RequestOptionFunc is a function type for request options
-type RequestOptionFunc func(*http.Request) error
-
-// WithHeader adds a header to the request
-func WithHeader(key, value string) RequestOptionFunc {
-	return func(req *http.Request) error {
-		req.Header.Set(key, value)
-		return nil
-	}
 }
 
 // MigrateOptions specifies VM migration options
